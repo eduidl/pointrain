@@ -1,0 +1,20 @@
+[package]
+name = "pointrain"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+license.workspace = true
+
+[dependencies]
+pointrain-core.workspace = true
+pointrain-io = { workspace = true, optional = true }
+
+[features]
+io = ["pointrain-io"]
+rerun = ["pointrain-core/rerun"]
+
+[dev-dependencies]
+rerun = { version = "0.8", features = ["native_viewer"] }
+structopt = "0.3"

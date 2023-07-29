@@ -1,0 +1,14 @@
+[package]
+name = "pointrain-io"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+license.workspace = true
+
+[dependencies]
+bytes = "1.2"
+nalgebra.workspace = true
+pointrain-core.workspace = true
+thiserror.workspace = true

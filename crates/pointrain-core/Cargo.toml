@@ -1,0 +1,16 @@
+[package]
+name = "pointrain-core"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+license.workspace = true
+
+[dependencies]
+colorgrad = { version = "0.6", optional = true }
+nalgebra.workspace = true
+rerun = { version = "0.8", optional = true }
+
+[features]
+rerun = ["dep:rerun", "colorgrad"]

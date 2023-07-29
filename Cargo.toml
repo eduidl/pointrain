@@ -1,0 +1,18 @@
+[workspace]
+members = ["crates/*", "examples/*"]
+
+[workspace.package]
+authors = ["Yume Hiramatsu <yuma.hiramatsu@gmail.com>"]
+edition = "2021"
+rust-version = "1.64.0"
+repository = "https://github.com/eduidl/pointrain"
+license = "Apache-2.0"
+
+[workspace.dependencies]
+anyhow = "1.0"
+nalgebra = "0.32"
+rerun = "0.8"
+thiserror = "1.0"
+pointrain = { path = "./crates/pointrain" }
+pointrain-core = { path = "./crates/pointrain-core" }
+pointrain-io = { path = "./crates/pointrain-io" }
