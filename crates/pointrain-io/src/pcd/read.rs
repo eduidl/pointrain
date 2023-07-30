@@ -7,20 +7,21 @@ use std::{
 use nalgebra::{Quaternion, Vector3};
 use pointrain_core::traits::PointCloud;
 
-use super::{
+use super::point::PointReadable;
+use crate::{
     field::{PointField, PointFieldDatum, PointFieldType},
-    point::PointReadable,
+    PointRainIOError,
 };
-use crate::PointRainIOError;
 
-#[derive(Debug, Clone, Copy)]
-enum PCDDataType {
+#[derive(Debug, Default, Clone, Copy)]
+enum PcdDataFormat {
+    #[default]
     Ascii,
     Binary,
     BinaryCompressed,
 }
 
-impl TryFrom<&str> for PCDDataType {
+impl TryFrom<&str> for PcdDataFormat {
     type Error = String;
 
     fn try_from(from: &str) -> Result<Self, Self::Error> {
@@ -29,33 +30,20 @@ impl TryFrom<&str> for PCDDataType {
             "binary" => Self::Binary,
             "binary_compressed" => Self::BinaryCompressed,
             _ => {
-                return Err(format!("Unknown data type: {from}"));
+                return Err(format!("Unknown data format: {from}"));
             }
         })
     }
 }
 
-#[derive(Debug)]
-pub struct PCDHeader {
-    data_type: PCDDataType,
+#[derive(Debug, Default)]
+struct PcdHeader {
+    format: PcdDataFormat,
     fields: Vec<PointField>,
     width: usize,
     height: usize,
     origin: Vector3<f32>,
     orientation: Quaternion<f32>,
-}
-
-impl Default for PCDHeader {
-    fn default() -> Self {
-        Self {
-            data_type: PCDDataType::Ascii,
-            fields: Vec::new(),
-            width: 0,
-            height: 0,
-            origin: Vector3::zeros(),
-            orientation: Quaternion::identity(),
-        }
-    }
 }
 
 // https://github.com/PointCloudLibrary/pcl/blob/master/io/src/pcd_io.cpp
@@ -67,13 +55,13 @@ where
     let file = File::open(f)?;
 
     let (header, mut reader) = pcd_read_header(&file)?;
-    pcd_read_data::<PC>(&mut reader, &header)
+    pcd_read_data::<PC>(&header, &mut reader)
 }
 
-fn pcd_read_header(file: &File) -> Result<(PCDHeader, BufReader<&File>), PointRainIOError> {
+fn pcd_read_header(file: &File) -> Result<(PcdHeader, BufReader<&File>), PointRainIOError> {
     let mut reader = BufReader::new(file);
     let mut line = String::new();
-    let mut header = PCDHeader::default();
+    let mut header = PcdHeader::default();
     let mut field_sizes = Vec::new();
 
     while reader.read_line(&mut line)? > 0 {
@@ -135,7 +123,7 @@ fn pcd_read_header(file: &File) -> Result<(PCDHeader, BufReader<&File>), PointRa
                     .zip(header.fields.iter_mut())
                 {
                     let type_ = token.chars().next().unwrap();
-                    field.datatype = PointFieldType::from_type_and_size(type_, *size)?;
+                    field.datatype = PointFieldType::from_pcd_type_and_size(type_, *size)?;
                 }
             }
             "COUNT" => {
@@ -202,10 +190,14 @@ fn pcd_read_header(file: &File) -> Result<(PCDHeader, BufReader<&File>), PointRa
                 }
             }
             "DATA" => {
-                header.data_type = tokens[1].try_into()?;
+                header.format = tokens[1].try_into()?;
                 break;
             }
-            _ => (),
+            _ => {
+                return Err(PointRainIOError::Error {
+                    msg: format!("Unknown token: {}", tokens[0]).into(),
+                });
+            }
         }
 
         line.clear();
@@ -225,8 +217,8 @@ fn pcd_read_header(file: &File) -> Result<(PCDHeader, BufReader<&File>), PointRa
 }
 
 fn pcd_read_data<PC>(
+    header: &PcdHeader,
     reader: &mut BufReader<&File>,
-    header: &PCDHeader,
 ) -> Result<PC, PointRainIOError>
 where
     PC: PointCloud,
@@ -235,18 +227,18 @@ where
     let mut pc = PC::with_capacity(header.width * header.height);
     let func = PC::Point::read_data_func(&header.fields)?;
 
-    match header.data_type {
-        PCDDataType::Ascii => {
+    match header.format {
+        PcdDataFormat::Ascii => {
             for line in reader.lines() {
-                let data = pcd_read_ascii_datum(line?.as_str(), header)?;
+                let data = pcd_read_ascii_datum(header, line?.as_str())?;
                 pc.add_point(func(&data)?);
             }
         }
-        PCDDataType::Binary => {
+        PcdDataFormat::Binary => {
             let chunk_size = header.fields.iter().map(PointField::bytes).sum();
             let mut chunk = vec![0; chunk_size];
             while reader.read_exact(&mut chunk).is_ok() {
-                let data = pcd_read_binary_datum(&mut chunk.as_slice(), header);
+                let data = pcd_read_binary_datum(header, &mut chunk.as_slice());
                 pc.add_point(func(&data)?);
             }
             if !reader.fill_buf()?.is_empty() {
@@ -255,7 +247,7 @@ where
                 });
             }
         }
-        PCDDataType::BinaryCompressed => {
+        PcdDataFormat::BinaryCompressed => {
             unimplemented!("binary compressed format is not supported");
         }
     }
@@ -277,14 +269,19 @@ where
 }
 
 fn pcd_read_ascii_datum(
+    header: &PcdHeader,
     line: &str,
-    header: &PCDHeader,
 ) -> Result<Vec<PointFieldDatum>, PointRainIOError> {
     let tokens: Vec<_> = line.trim().split(&[' ', '\t', '\r']).collect();
 
     if tokens.len() != header.fields.len() {
         return Err(PointRainIOError::Error {
-            msg: "Not enough number of elements".into(),
+            msg: format!(
+                "Invalid number of tokens: expected {}, got {}",
+                header.fields.len(),
+                tokens.len()
+            )
+            .into(),
         });
     }
 
@@ -295,10 +292,10 @@ fn pcd_read_ascii_datum(
         .collect::<Result<_, _>>()?)
 }
 
-fn pcd_read_binary_datum(chunk: &mut &[u8], header: &PCDHeader) -> Vec<PointFieldDatum> {
+fn pcd_read_binary_datum(header: &PcdHeader, chunk: &mut &[u8]) -> Vec<PointFieldDatum> {
     header
         .fields
         .iter()
-        .map(|field| PointFieldDatum::from_bytes(chunk, field.datatype))
+        .map(|field| PointFieldDatum::from_bytes_le(chunk, field.datatype))
         .collect()
 }

@@ -1,4 +1,4 @@
 pub mod point;
 mod read;
 
-pub use read::pcd_read;
+pub use read::ply_read;
