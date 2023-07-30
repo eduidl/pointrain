@@ -6,4 +6,4 @@
 cargo run -p pcd_read -- -P ./data/bun0.pcd
 ```
 
-![image](https://github.com/eduidl/pointrain/assets/25898373/70203b9c-9f96-4065-8f5b-d7d7f28a8433)
+![image](https://github.com/eduidl/pointrain/assets/25898373/2b61d172-b305-4286-a47a-7d7c948ea945)
