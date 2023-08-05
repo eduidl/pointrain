@@ -4,7 +4,7 @@ use std::{
     path::Path,
 };
 
-use pointrain_core::traits::PointCloud;
+use pointrain_core::pc::PointCloudBase;
 
 use super::point::PointReadable;
 use crate::{
@@ -44,7 +44,7 @@ pub struct PlyHeader {
 
 pub fn ply_read<PC>(f: impl AsRef<Path>) -> Result<PC, PointRainIOError>
 where
-    PC: PointCloud,
+    PC: PointCloudBase,
     PC::Point: PointReadable,
 {
     let file = File::open(f)?;
@@ -101,7 +101,7 @@ fn ply_read_data<PC>(
     header: &PlyHeader,
 ) -> Result<PC, PointRainIOError>
 where
-    PC: PointCloud,
+    PC: PointCloudBase,
     PC::Point: PointReadable,
 {
     let mut pc = PC::with_capacity(header.vertices_size);
@@ -111,7 +111,7 @@ where
         PlyDataFormat::Ascii => {
             for line in reader.lines().take(header.vertices_size) {
                 let data = ply_read_ascii_datum(header, line?.as_str())?;
-                pc.add_point(func(&data)?);
+                pc.push(func(&data)?);
             }
         }
         PlyDataFormat::BinaryLE | PlyDataFormat::BinaryBE => {
@@ -120,7 +120,7 @@ where
             for _ in 0..header.vertices_size {
                 reader.read_exact(&mut chunk)?;
                 let data = pcd_read_binary_datum(header, &mut chunk.as_slice());
-                pc.add_point(func(&data)?);
+                pc.push(func(&data)?);
             }
         }
     }

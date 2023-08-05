@@ -1,13 +1,12 @@
 use pointrain_core::{
-    pc::{PointCloudXYZI, PointCloudXYZNormal},
-    traits::{PointCloud, PointCloudWithNormal},
+    pc::{PointCloudBase, PointCloudIntensity, PointCloudNormal, PointCloudWithNormal},
     types::{Normal, Position},
 };
 use pointrain_io::{pcd_read, PointRainIOError};
 
 #[test]
 fn test_pcd_read_ascii() {
-    let pc: PointCloudXYZNormal = pcd_read("tests/data/pcd/test_ascii.pcd").unwrap();
+    let pc: PointCloudNormal = pcd_read("tests/data/pcd/test_ascii.pcd").unwrap();
 
     assert_eq!(pc.len(), 3);
     assert_eq!(pc.positions()[0], Position::new(1.0, 2.0, 3.0));
@@ -17,7 +16,7 @@ fn test_pcd_read_ascii() {
 
 #[test]
 fn test_pcd_read_ascii_missing_field() {
-    let err = pcd_read::<PointCloudXYZI>("tests/data/pcd/test_ascii.pcd").unwrap_err();
+    let err = pcd_read::<PointCloudIntensity>("tests/data/pcd/test_ascii.pcd").unwrap_err();
 
     assert!(matches!(
         err,
@@ -27,7 +26,7 @@ fn test_pcd_read_ascii_missing_field() {
 
 #[test]
 fn test_pcd_read_binary() {
-    let pc: PointCloudXYZNormal = pcd_read("tests/data/pcd/test_binary.pcd").unwrap();
+    let pc: PointCloudNormal = pcd_read("tests/data/pcd/test_binary.pcd").unwrap();
 
     assert_eq!(pc.len(), 3);
     assert_eq!(pc.positions()[0], Position::new(1.0, 2.0, 3.0));

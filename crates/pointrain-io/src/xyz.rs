@@ -5,19 +5,19 @@ use std::{
 };
 
 use pointrain_core::{
-    pc::{point::PointXYZ, PointCloudXYZ},
-    traits::PointCloud,
+    pc::{PointCloud, PointCloudBase},
+    point::Point,
     types::Position,
 };
 
 use crate::error::PointRainIOError;
 
-pub fn xyz_read(f: impl AsRef<Path>) -> Result<PointCloudXYZ, PointRainIOError> {
+pub fn xyz_read(f: impl AsRef<Path>) -> Result<PointCloud, PointRainIOError> {
     let file = File::open(f)?;
 
     let mut reader = BufReader::new(file);
     let mut line = String::new();
-    let mut pc = PointCloudXYZ::new();
+    let mut pc = PointCloud::new();
 
     while reader.read_line(&mut line)? > 0 {
         if line.starts_with('#') {
@@ -36,8 +36,8 @@ pub fn xyz_read(f: impl AsRef<Path>) -> Result<PointCloudXYZ, PointRainIOError> 
         let y: f32 = tokens[1].parse()?;
         let z: f32 = tokens[2].parse()?;
 
-        pc.add_point(PointXYZ {
-            pos: Position::new(x, y, z),
+        pc.push(Point {
+            position: Position::new(x, y, z),
         });
 
         line.clear();

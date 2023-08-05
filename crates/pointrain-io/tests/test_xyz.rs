@@ -1,4 +1,4 @@
-use pointrain_core::{traits::PointCloud, types::Position};
+use pointrain_core::{pc::PointCloudBase, types::Position};
 use pointrain_io::{xyz_read, PointRainIOError};
 
 #[test]

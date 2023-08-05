@@ -11,7 +11,7 @@ description = "Core library for Pointrain"
 [dependencies]
 colorgrad = { version = "0.6", optional = true }
 nalgebra.workspace = true
-rerun = { version = "0.8", optional = true }
+rerun = { workspace = true, optional = true }
 
 [features]
 rerun = ["dep:rerun", "colorgrad"]

@@ -1,7 +1,5 @@
 use pointrain_core::{
-    pc::point::{
-        PointXYZ, PointXYZI, PointXYZINormal, PointXYZNormal, PointXYZRgb, PointXYZRgbNormal,
-    },
+    point::{Point, PointIntensity, PointIntensityNormal, PointNormal, PointRgb, PointRgbNormal},
     types::{Normal, Position},
 };
 
@@ -50,13 +48,13 @@ pub trait PointReadable: Sized {
     fn read_data_func(fields: &[PointField]) -> Result<PointMapper<Self>, PointRainIOError>;
 }
 
-impl PointReadable for PointXYZ {
+impl PointReadable for Point {
     fn read_data_func(fields: &[PointField]) -> Result<PointMapper<Self>, PointRainIOError> {
         let (x, y, z) = find_xyz(fields)?;
 
         let closure = move |data: &[PointFieldDatum]| {
             Ok(Self {
-                pos: Position::new(data[x].to_float(), data[y].to_float(), data[z].to_float()),
+                position: Position::new(data[x].to_float(), data[y].to_float(), data[z].to_float()),
             })
         };
 
@@ -64,14 +62,14 @@ impl PointReadable for PointXYZ {
     }
 }
 
-impl PointReadable for PointXYZNormal {
+impl PointReadable for PointNormal {
     fn read_data_func(fields: &[PointField]) -> Result<PointMapper<Self>, PointRainIOError> {
         let (x, y, z) = find_xyz(fields)?;
         let (nx, ny, nz, curvature) = find_normal(fields)?;
 
         let closure = move |data: &[PointFieldDatum]| {
             Ok(Self {
-                pos: Position::new(data[x].to_float(), data[y].to_float(), data[z].to_float()),
+                position: Position::new(data[x].to_float(), data[y].to_float(), data[z].to_float()),
                 normal: Normal::new(
                     data[nx].to_float(),
                     data[ny].to_float(),
@@ -85,14 +83,14 @@ impl PointReadable for PointXYZNormal {
     }
 }
 
-impl PointReadable for PointXYZI {
+impl PointReadable for PointIntensity {
     fn read_data_func(fields: &[PointField]) -> Result<PointMapper<Self>, PointRainIOError> {
         let (x, y, z) = find_xyz(fields)?;
         let intensity = find_intensity(fields)?;
 
         let closure = move |data: &[PointFieldDatum]| {
             Ok(Self {
-                pos: Position::new(data[x].to_float(), data[y].to_float(), data[z].to_float()),
+                position: Position::new(data[x].to_float(), data[y].to_float(), data[z].to_float()),
                 intensity: data[intensity].to_float(),
             })
         };
@@ -101,7 +99,7 @@ impl PointReadable for PointXYZI {
     }
 }
 
-impl PointReadable for PointXYZINormal {
+impl PointReadable for PointIntensityNormal {
     fn read_data_func(fields: &[PointField]) -> Result<PointMapper<Self>, PointRainIOError> {
         let (x, y, z) = find_xyz(fields)?;
         let intensity = find_intensity(fields)?;
@@ -109,7 +107,7 @@ impl PointReadable for PointXYZINormal {
 
         let closure = move |data: &[PointFieldDatum]| {
             Ok(Self {
-                pos: Position::new(data[x].to_float(), data[y].to_float(), data[z].to_float()),
+                position: Position::new(data[x].to_float(), data[y].to_float(), data[z].to_float()),
                 intensity: data[intensity].to_float(),
                 normal: Normal::new(
                     data[nx].to_float(),
@@ -124,14 +122,14 @@ impl PointReadable for PointXYZINormal {
     }
 }
 
-impl PointReadable for PointXYZRgb {
+impl PointReadable for PointRgb {
     fn read_data_func(fields: &[PointField]) -> Result<PointMapper<Self>, PointRainIOError> {
         let (x, y, z) = find_xyz(fields)?;
         let rgb = find_rgb(fields)?;
 
         let closure = move |data: &[PointFieldDatum]| {
             Ok(Self {
-                pos: Position::new(data[x].to_float(), data[y].to_float(), data[z].to_float()),
+                position: Position::new(data[x].to_float(), data[y].to_float(), data[z].to_float()),
                 color: data[rgb].to_color()?,
             })
         };
@@ -140,7 +138,7 @@ impl PointReadable for PointXYZRgb {
     }
 }
 
-impl PointReadable for PointXYZRgbNormal {
+impl PointReadable for PointRgbNormal {
     fn read_data_func(fields: &[PointField]) -> Result<PointMapper<Self>, PointRainIOError> {
         let (x, y, z) = find_xyz(fields)?;
         let rgb = find_rgb(fields)?;
@@ -148,7 +146,7 @@ impl PointReadable for PointXYZRgbNormal {
 
         let closure = move |data: &[PointFieldDatum]| {
             Ok(Self {
-                pos: Position::new(data[x].to_float(), data[y].to_float(), data[z].to_float()),
+                position: Position::new(data[x].to_float(), data[y].to_float(), data[z].to_float()),
                 color: data[rgb].to_color()?,
                 normal: Normal::new(
                     data[nx].to_float(),

@@ -5,7 +5,7 @@ use std::{
 };
 
 use nalgebra::{Quaternion, Vector3};
-use pointrain_core::traits::PointCloud;
+use pointrain_core::pc::PointCloudBase;
 
 use super::point::PointReadable;
 use crate::{
@@ -49,7 +49,7 @@ struct PcdHeader {
 // https://github.com/PointCloudLibrary/pcl/blob/master/io/src/pcd_io.cpp
 pub fn pcd_read<PC>(f: impl AsRef<Path>) -> Result<PC, PointRainIOError>
 where
-    PC: PointCloud,
+    PC: PointCloudBase,
     PC::Point: PointReadable,
 {
     let file = File::open(f)?;
@@ -221,7 +221,7 @@ fn pcd_read_data<PC>(
     reader: &mut BufReader<&File>,
 ) -> Result<PC, PointRainIOError>
 where
-    PC: PointCloud,
+    PC: PointCloudBase,
     PC::Point: PointReadable,
 {
     let mut pc = PC::with_capacity(header.width * header.height);
@@ -231,7 +231,7 @@ where
         PcdDataFormat::Ascii => {
             for line in reader.lines() {
                 let data = pcd_read_ascii_datum(header, line?.as_str())?;
-                pc.add_point(func(&data)?);
+                pc.push(func(&data)?);
             }
         }
         PcdDataFormat::Binary => {
@@ -239,7 +239,7 @@ where
             let mut chunk = vec![0; chunk_size];
             while reader.read_exact(&mut chunk).is_ok() {
                 let data = pcd_read_binary_datum(header, &mut chunk.as_slice());
-                pc.add_point(func(&data)?);
+                pc.push(func(&data)?);
             }
             if !reader.fill_buf()?.is_empty() {
                 return Err(PointRainIOError::Error {

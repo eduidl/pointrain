@@ -1,20 +1,17 @@
-mod xyz;
-mod xyz_normal;
-mod xyz_rgb;
-mod xyz_rgb_normal;
-mod xyzi;
-mod xyzi_normal;
+mod base;
+pub mod intensity;
+pub mod intensity_normal;
+pub mod normal;
+pub mod rgb;
+pub mod rgb_normal;
+pub mod xyz;
 
-pub use xyz::PointCloudXYZ;
-pub use xyz_normal::PointCloudXYZNormal;
-pub use xyz_rgb::PointCloudXYZRgb;
-pub use xyz_rgb_normal::PointCloudXYZRgbNormal;
-pub use xyzi::PointCloudXYZI;
-pub use xyzi_normal::PointCloudXYZINormal;
-
-pub mod point {
-    pub use super::{
-        xyz::PointXYZ, xyz_normal::PointXYZNormal, xyz_rgb::PointXYZRgb,
-        xyz_rgb_normal::PointXYZRgbNormal, xyzi::PointXYZI, xyzi_normal::PointXYZINormal,
-    };
-}
+pub use base::{
+    PointCloudBase, PointCloudWithColor, PointCloudWithIntensity, PointCloudWithNormal,
+};
+pub use intensity::PointCloud as PointCloudIntensity;
+pub use intensity_normal::PointCloud as PointCloudIntensityNormal;
+pub use normal::PointCloud as PointCloudNormal;
+pub use rgb::PointCloud as PointCloudRgb;
+pub use rgb_normal::PointCloud as PointCloudRgbNormal;
+pub use xyz::PointCloud;
