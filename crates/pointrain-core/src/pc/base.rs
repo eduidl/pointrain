@@ -1,3 +1,4 @@
+use nalgebra as na;
 #[cfg(feature = "rerun")]
 use rerun::components::{Arrow3D, ColorRGBA, Point3D, Vec3D};
 
@@ -34,6 +35,48 @@ pub trait PointCloudBase: Default {
     }
     fn is_empty(&self) -> bool {
         self.len() == 0
+    }
+
+    fn translate(mut self, translation: impl Into<na::Translation3<Float>>) -> Self {
+        self.translate_mut(translation);
+        self
+    }
+
+    fn translate_mut(&mut self, translation: impl Into<na::Translation3<Float>>) -> &mut Self {
+        let translation: na::Translation3<Float> = translation.into();
+
+        for p in self.positions_mut() {
+            *p = translation.transform_point(p);
+        }
+        self
+    }
+
+    fn rotate(mut self, rotation: impl Into<na::UnitQuaternion<Float>>) -> Self {
+        self.rotate_mut(rotation);
+        self
+    }
+
+    fn rotate_mut(&mut self, rotation: impl Into<na::UnitQuaternion<Float>>) -> &mut Self {
+        let rotation: na::UnitQuaternion<Float> = rotation.into();
+
+        for p in self.positions_mut() {
+            *p = rotation.transform_point(p);
+        }
+        self
+    }
+
+    fn transform(mut self, transform: impl Into<na::Transform3<Float>>) -> Self {
+        self.transform_mut(transform);
+        self
+    }
+
+    fn transform_mut(&mut self, transform: impl Into<na::Transform3<Float>>) -> &mut Self {
+        let transform: na::Transform3<Float> = transform.into();
+
+        for p in self.positions_mut() {
+            *p = transform.transform_point(p);
+        }
+        self
     }
 
     #[cfg(feature = "rerun")]
