@@ -1,0 +1,15 @@
+[package]
+name = "pointrain-filter"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+license.workspace = true
+
+[dependencies]
+kiddo = "2.1"
+pointrain-core.workspace = true
+
+[dev-dependencies]
+approx.workspace = true

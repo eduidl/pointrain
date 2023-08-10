@@ -21,6 +21,14 @@ impl PointBase for Point {
             position: &mut self.position,
         }
     }
+
+    fn position(&self) -> &Position {
+        &self.position
+    }
+
+    fn position_mut(&mut self) -> &mut Position {
+        &mut self.position
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]

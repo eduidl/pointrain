@@ -10,9 +10,12 @@ description = "Poitcloud processing library"
 
 [dependencies]
 pointrain-core.workspace = true
+pointrain-filter = { workspace = true, optional = true }
 pointrain-io = { workspace = true, optional = true }
 
 [features]
+default = ["filter"]
+filter = ["pointrain-filter"]
 io = ["pointrain-io"]
 rerun = ["pointrain-core/rerun"]
 

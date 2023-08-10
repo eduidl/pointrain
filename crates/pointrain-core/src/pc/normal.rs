@@ -65,6 +65,12 @@ impl PointCloudBase for PointCloud {
         }
     }
 
+    fn resize(&mut self, new_len: usize, value: Self::Point) {
+        self.positions.resize(new_len, value.position);
+        self.normals.resize(new_len, value.normal);
+        self.curvatures.resize(new_len, value.curvature);
+    }
+
     fn positions(&self) -> &[Position] {
         &self.positions
     }

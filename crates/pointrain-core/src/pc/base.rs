@@ -20,6 +20,7 @@ pub trait PointCloudBase: Default {
         Default::default()
     }
     fn with_capacity(capacity: usize) -> Self;
+    fn resize(&mut self, new_len: usize, value: Self::Point);
 
     fn positions(&self) -> &[Position];
     fn positions_mut(&mut self) -> &mut [Position];

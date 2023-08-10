@@ -6,7 +6,7 @@ fn test_xyz_read() {
     let pc = xyz_read("tests/data/xyz/test.xyz").unwrap();
     assert_eq!(pc.len(), 3);
     assert_eq!(pc.positions()[0], Position::new(0.1, -0.2, 0.3));
-    assert_eq!(pc.positions()[1], Position::new(1.0, -2.0, 3.0));
+    assert_eq!(pc.positions()[1], Position::new(1., -2., 3.));
     assert_eq!(pc.positions()[2], Position::new(10., -200., 3000.));
 }
 

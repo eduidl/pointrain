@@ -10,9 +10,11 @@ license = "Apache-2.0"
 
 [workspace.dependencies]
 anyhow = "1.0"
+approx = "0.5"
 nalgebra = "0.32"
 pointrain = { path = "./crates/pointrain", version = "=0.1.0" }
 pointrain-core = { path = "./crates/pointrain-core", version = "=0.1.0" }
+pointrain-filter = { path = "./crates/pointrain-filter", version = "=0.1.0" }
 pointrain-io = { path = "./crates/pointrain-io", version = "=0.1.0" }
 rerun = "0.8"
 thiserror = "1.0"

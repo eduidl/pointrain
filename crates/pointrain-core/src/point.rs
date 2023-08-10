@@ -1,3 +1,5 @@
+use crate::types::Position;
+
 pub mod intensity;
 pub mod intensity_normal;
 pub mod normal;
@@ -21,7 +23,7 @@ pub use rgb_normal::{
 };
 pub use xyz::{Point, PointRef, PointRefMut};
 
-pub trait PointBase {
+pub trait PointBase: Default {
     type Ref<'a>
     where
         Self: 'a;
@@ -31,4 +33,7 @@ pub trait PointBase {
 
     fn as_ref(&self) -> Self::Ref<'_>;
     fn as_ref_mut(&mut self) -> Self::RefMut<'_>;
+
+    fn position(&self) -> &Position;
+    fn position_mut(&mut self) -> &mut Position;
 }

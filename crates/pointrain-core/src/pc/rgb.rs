@@ -64,6 +64,11 @@ impl PointCloudBase for PointCloud {
         }
     }
 
+    fn resize(&mut self, new_len: usize, value: Self::Point) {
+        self.positions.resize(new_len, value.position);
+        self.colors.resize(new_len, value.color);
+    }
+
     fn positions(&self) -> &[Position] {
         &self.positions
     }

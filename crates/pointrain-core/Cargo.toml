@@ -17,4 +17,4 @@ rerun = { workspace = true, optional = true }
 rerun = ["dep:rerun", "colorgrad"]
 
 [dev-dependencies]
-approx = "0.5.1"
+approx.workspace = true
