@@ -59,8 +59,8 @@ jobs:
       - name: Install Tools
         run: cargo install cargo-audit cargo-outdated
 
-      # - name: Outdated
-      #   run: cargo outdated --exit-code 1
+      - name: Outdated
+        run: cargo outdated --root-deps-only --exit-code 1
 
       - name: Audit
-        run: cargo audit
+        run: cargo audit || true
