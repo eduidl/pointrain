@@ -5,7 +5,7 @@ members = ["crates/*", "examples/*"]
 [workspace.package]
 authors = ["Yume Hiramatsu <yuma.hiramatsu@gmail.com>"]
 edition = "2021"
-rust-version = "1.69.0"
+rust-version = "1.71.1"
 repository = "https://github.com/eduidl/pointrain"
 license = "Apache-2.0"
 
