@@ -5,17 +5,17 @@ members = ["crates/*", "examples/*"]
 [workspace.package]
 authors = ["Yume Hiramatsu <yuma.hiramatsu@gmail.com>"]
 edition = "2021"
-rust-version = "1.71.1"
+rust-version = "1.72.0"
 repository = "https://github.com/eduidl/pointrain"
 license = "Apache-2.0"
 
 [workspace.dependencies]
-anyhow = "1.0"
-approx = "0.5"
-nalgebra = "0.32"
+anyhow = "1.0.75"
+approx = "0.5.1"
+nalgebra = "0.32.3"
 pointrain = { path = "./crates/pointrain", version = "=0.1.0" }
 pointrain-core = { path = "./crates/pointrain-core", version = "=0.1.0" }
 pointrain-filter = { path = "./crates/pointrain-filter", version = "=0.1.0" }
 pointrain-io = { path = "./crates/pointrain-io", version = "=0.1.0" }
-rerun = "0.8"
-thiserror = "1.0"
+re_types = "0.10.1"
+thiserror = "1.0.50"

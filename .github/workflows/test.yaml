@@ -19,7 +19,7 @@ jobs:
 
       matrix:
         rust:
-          - 1.71.1
+          - 1.72.0
           - stable
           - beta
           - nightly
@@ -35,10 +35,10 @@ jobs:
           toolchain: ${{ matrix.rust }}
 
       - name: Check
-        run: cargo build --workspace
+        run: cargo build --workspace --all-features --exclude pc-read
 
       - name: Test
-        run: cargo test --workspace
+        run: cargo test --workspace --all-features --exclude pc-read
 
   audit:
     runs-on: ubuntu-latest

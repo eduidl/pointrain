@@ -1,6 +1,3 @@
-#[cfg(feature = "rerun")]
-use rerun::{EntityPath, MsgSender, MsgSenderError};
-
 use super::PointCloudBase;
 use crate::{
     point::{
@@ -21,11 +18,8 @@ impl PointCloud {
     }
 
     #[cfg(feature = "rerun")]
-    pub fn rerun_msg_sender(
-        &self,
-        label: impl Into<EntityPath>,
-    ) -> Result<MsgSender, MsgSenderError> {
-        MsgSender::new(label.into()).with_component(&self.pos_component())
+    pub fn rerun_points(&self) -> re_types::archetypes::Points3D {
+        self.pos_component_base()
     }
 }
 

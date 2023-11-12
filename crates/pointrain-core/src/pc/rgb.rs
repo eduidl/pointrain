@@ -1,6 +1,3 @@
-#[cfg(feature = "rerun")]
-use rerun::{EntityPath, MsgSender, MsgSenderError};
-
 use super::{PointCloudBase, PointCloudWithColor};
 use crate::{
     point::{
@@ -22,13 +19,8 @@ impl PointCloud {
     }
 
     #[cfg(feature = "rerun")]
-    pub fn rerun_msg_sender(
-        &self,
-        label: impl Into<EntityPath>,
-    ) -> Result<MsgSender, MsgSenderError> {
-        MsgSender::new(label.into())
-            .with_component(&self.pos_component())?
-            .with_component(&self.color_component())
+    pub fn rerun_points(&self) -> re_types::archetypes::Points3D {
+        self.pos_component_base().with_colors(self.rerun_colors())
     }
 }
 
