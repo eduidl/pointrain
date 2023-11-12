@@ -8,7 +8,7 @@ repository.workspace = true
 license.workspace = true
 
 [dependencies]
-kiddo = "2.1"
+kiddo = "3.0.0"
 pointrain-core.workspace = true
 
 [dev-dependencies]

@@ -8,7 +8,7 @@ pub fn kdtree<PC: PointCloudBase>(pc: &PC) -> KdTree<f32, 3> {
     let mut kdtree = KdTree::with_capacity(pc.len());
 
     for (i, p) in pc.positions().iter().enumerate() {
-        kdtree.add(&[p.x, p.y, p.z], i);
+        kdtree.add(&[p.x, p.y, p.z], i.try_into().unwrap());
     }
     kdtree
 }

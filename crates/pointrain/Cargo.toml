@@ -18,7 +18,3 @@ default = ["filter"]
 filter = ["pointrain-filter"]
 io = ["pointrain-io"]
 rerun = ["pointrain-core/rerun"]
-
-[dev-dependencies]
-rerun = { version = "0.8", features = ["native_viewer"] }
-structopt = "0.3"

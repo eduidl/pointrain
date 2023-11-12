@@ -1,6 +1,9 @@
 use nalgebra as na;
 #[cfg(feature = "rerun")]
-use rerun::components::{Arrow3D, ColorRGBA, Point3D, Vec3D};
+use re_types::{
+    archetypes::{Arrows3D, Points3D},
+    components::{Color, Position3D},
+};
 
 use crate::{
     point::PointBase,
@@ -81,11 +84,16 @@ pub trait PointCloudBase: Default {
     }
 
     #[cfg(feature = "rerun")]
-    fn pos_component(&self) -> Vec<Point3D> {
+    fn rerun_positions(&self) -> Vec<Position3D> {
         self.positions()
             .iter()
-            .map(|p| Point3D::new(p.x, p.y, p.z))
+            .map(|p| Position3D::new(p.x, p.y, p.z))
             .collect()
+    }
+
+    #[cfg(feature = "rerun")]
+    fn pos_component_base(&self) -> Points3D {
+        Points3D::new(self.rerun_positions())
     }
 }
 
@@ -94,7 +102,7 @@ pub trait PointCloudWithIntensity: PointCloudBase {
     fn intensities_mut(&mut self) -> &mut [Float];
 
     #[cfg(feature = "rerun")]
-    fn intensity_color_component(&self, scale: Option<f32>) -> Vec<ColorRGBA> {
+    fn intensity_colors(&self, scale: Option<f32>) -> Vec<Color> {
         let scale = scale.unwrap_or_else(|| {
             let max_intensity = self.intensities().iter().fold(f32::NAN, |a, b| b.max(a));
             assert!(max_intensity.is_finite());
@@ -107,7 +115,7 @@ pub trait PointCloudWithIntensity: PointCloudBase {
             .map(|i| {
                 let t = i / (scale + 1e-6);
                 let [r, g, b, _] = turbo.at(t as f64).to_rgba8();
-                ColorRGBA::from_rgb(r, g, b)
+                Color::from_rgb(r, g, b)
             })
             .collect()
     }
@@ -120,17 +128,15 @@ pub trait PointCloudWithNormal: PointCloudBase {
     fn curvatures_mut(&mut self) -> &mut [Float];
 
     #[cfg(feature = "rerun")]
-    fn normal_component(&self, scale: Option<f32>) -> Vec<Arrow3D> {
+    fn normal_component_base(&self, scale: Option<f32>) -> Arrows3D {
         let scale = scale.unwrap_or(0.005);
 
-        self.positions()
-            .iter()
-            .zip(self.normals().iter())
-            .map(|(p, n)| Arrow3D {
-                origin: Vec3D::new(p.x, p.y, p.z),
-                vector: Vec3D::new(n.x * scale, n.y * scale, n.z * scale),
-            })
-            .collect()
+        Arrows3D::from_vectors(
+            self.normals()
+                .iter()
+                .map(|n| (n.x * scale, n.y * scale, n.z * scale)),
+        )
+        .with_origins(self.rerun_positions())
     }
 }
 
@@ -139,10 +145,10 @@ pub trait PointCloudWithColor: PointCloudBase {
     fn colors_mut(&mut self) -> &mut [Rgb];
 
     #[cfg(feature = "rerun")]
-    fn color_component(&self) -> Vec<ColorRGBA> {
+    fn rerun_colors(&self) -> Vec<Color> {
         self.colors()
             .iter()
-            .map(|c| ColorRGBA::from_rgb(c.x, c.y, c.z))
+            .map(|c| Color::from_rgb(c.x, c.y, c.z))
             .collect()
     }
 }

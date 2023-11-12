@@ -21,7 +21,7 @@ struct Opt {
 fn main() -> anyhow::Result<()> {
     let opt = Opt::from_args();
 
-    let (stream, storage) = RecordingStreamBuilder::new("pointrain-test").memory()?;
+    let (rec, storage) = RecordingStreamBuilder::new("pointrain-test").memory()?;
 
     let ext = opt.path.extension().unwrap().to_str().unwrap();
     if !matches!(ext, "pcd" | "ply") {
@@ -35,7 +35,7 @@ fn main() -> anyhow::Result<()> {
                 "ply" => ply_read(opt.path)?,
                 _ => unreachable!(),
             };
-            pc.rerun_msg_sender("pointrain")?.send(&stream)?;
+            rec.log("pointrain", &pc.rerun_points())?;
         }
         "xyz_normal" => {
             let pc: PointCloudNormal = match ext {
@@ -43,7 +43,7 @@ fn main() -> anyhow::Result<()> {
                 "ply" => ply_read(opt.path)?,
                 _ => unreachable!(),
             };
-            pc.rerun_msg_sender("pointrain", None)?.send(&stream)?;
+            rec.log("pointrain", &pc.rerun_normals(None))?;
         }
         "xyzi" => {
             let pc: PointCloudIntensity = match ext {
@@ -51,7 +51,7 @@ fn main() -> anyhow::Result<()> {
                 "ply" => panic!("ply not supported for xyzi"),
                 _ => unreachable!(),
             };
-            pc.rerun_msg_sender("pointrain")?.send(&stream)?;
+            rec.log("pointrain", &pc.rerun_points(None))?;
         }
         "xyzi_normal" => {
             let pc: PointCloudIntensityNormal = match ext {
@@ -59,7 +59,7 @@ fn main() -> anyhow::Result<()> {
                 "ply" => panic!("ply not supported for xyzi_normal"),
                 _ => unreachable!(),
             };
-            pc.rerun_msg_sender("pointrain", None)?.send(&stream)?;
+            rec.log("pointrain", &pc.rerun_normals(None, None))?;
         }
         "xyzrgb" => {
             let pc: PointCloudRgb = match ext {
@@ -67,7 +67,7 @@ fn main() -> anyhow::Result<()> {
                 "ply" => ply_read(opt.path)?,
                 _ => unreachable!(),
             };
-            pc.rerun_msg_sender("pointrain")?.send(&stream)?;
+            rec.log("pointrain", &pc.rerun_points())?;
         }
         "xyzrgb_normal" => {
             let pc: PointCloudRgbNormal = match ext {
@@ -75,12 +75,12 @@ fn main() -> anyhow::Result<()> {
                 "ply" => ply_read(opt.path)?,
                 _ => unreachable!(),
             };
-            pc.rerun_msg_sender("pointrain", None)?.send(&stream)?;
+            rec.log("pointrain", &pc.rerun_normals(None))?;
         }
         v => return Err(anyhow::anyhow!("Unknown point type: {}", v)),
     }
 
-    stream.flush_blocking();
+    rec.flush_blocking();
 
     rerun::native_viewer::show(storage.take())?;
 

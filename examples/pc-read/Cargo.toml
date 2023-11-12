@@ -7,5 +7,5 @@ publish = false
 [dependencies]
 anyhow.workspace = true
 pointrain = { workspace = true, features = ["io", "rerun"] }
-rerun = { workspace = true, features = ["native_viewer"] }
-structopt = "0.3"
+rerun = { version = "0.10.1", features = ["native_viewer"] }
+structopt = "0.3.26"
